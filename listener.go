@@ -24,6 +24,12 @@ func Listen() (events <-chan KeyEvent, stopFn func()) {
 	return defaultListener.listen()
 }
 
+// ListenSelective is like Listen, but it only
+// dispatches events for the given virtual keys.
+func ListenSelective(keys ...VirtualKey) (events <-chan KeyEvent, stopFn func()) {
+	return defaultListener.listenSelective(keys...)
+}
+
 // listen listens for global key events, sending them on the
 // returned channel. listen halts execution and closes the
 // returned channel as soon as the returned function is called.
@@ -37,6 +43,29 @@ func (l *listener) listen() (<-chan KeyEvent, func()) {
 	}()
 
 	return events, func() { stopChan <- true; close(events) }
+}
+
+// listenSelective is like listen, but it only
+// dispatches events for the given virtual keys.
+func (l *listener) listenSelective(keys ...VirtualKey) (<-chan KeyEvent, func()) {
+	keySet := make(map[VirtualKey]struct{})
+	for _, key := range keys {
+		keySet[key] = struct{}{}
+	}
+
+	events := make(chan KeyEvent)
+	evt, stopFn := l.listen()
+
+	go func() {
+		for event := range evt {
+			_, ok := keySet[event.VirtualKey]
+			if ok {
+				events <- event
+			}
+		}
+	}()
+
+	return events, stopFn
 }
 
 // doListen listens for global key events,
