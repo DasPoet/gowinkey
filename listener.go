@@ -15,6 +15,15 @@ var defaultListener = &listener{
 	mu:        new(sync.Mutex),
 }
 
+// Listen listens for global key events, sending them on the
+// events channel.
+// Listen halts execution and closes the events channel as
+// soon as stopFn is called.
+// Listen does not block.
+func Listen() (events <-chan KeyEvent, stopFn func()) {
+	return defaultListener.listen()
+}
+
 // listen listens for global key events, sending them on the
 // returned channel. listen halts execution and closes the
 // returned channel as soon as the returned function is called.
