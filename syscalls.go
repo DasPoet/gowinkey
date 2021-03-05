@@ -1,6 +1,9 @@
 package gowinkey
 
-import "syscall"
+import (
+	"fmt"
+	"syscall"
+)
 
 var user32 = syscall.MustLoadDLL("user32")
 var keystate = user32.MustFindProc("GetAsyncKeyState")
@@ -12,7 +15,7 @@ var mapVirtualKey = user32.MustFindProc("MapVirtualKeyA")
 // for more details.
 func virtualKeyToString(vk VirtualKey) string {
 	char, _, _ := syscall.Syscall(mapVirtualKey.Addr(), 2, uintptr(vk), 2, 0)
-	return string(char)
+	return fmt.Sprint(char)
 }
 
 // getKeyState determines whether the given key is up or down
