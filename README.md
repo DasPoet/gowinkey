@@ -32,8 +32,6 @@
 
 ## Installation
 
----
-
 To use `gowinkey`, you need to have [Go](https://golang.org) installed and set up.
 
 Now, you can get `gowinkey` by running
@@ -50,15 +48,11 @@ import "github.com/daspoet/gowinkey"
 
 ## If you prefer using Java...
 
----
-
 
 ... be sure to check out the [Java version](https://github.com/lukasl-dev/jwinkey) of this package.
 
 
 ## Getting started
-
----
 
 To start listening to key events, simply run `gowinkey.Listen()`. It returns a channel on which all key events will be sent, and a function that you can call whenever you want `gowinkey` to stop listening to events. 
 
@@ -95,8 +89,6 @@ func main() {
 This will listen for and print out key events for one minute, providing additional information on whether an event was raised because of a key press or release.
 
 ## Filtering events
-
----
 
 Suppose that we don't want to get bombarded with key events. For instance, we could only be interested in events for the keys *W*, *A*, *S* and *D*, because we want to write some basic movement for a game, or something.
 
