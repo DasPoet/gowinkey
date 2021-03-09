@@ -1,6 +1,9 @@
 package gowinkey
 
-import "sync"
+import (
+	"sync"
+	"time"
+)
 
 const keyDown = 0x8000
 
@@ -77,6 +80,7 @@ Outer:
 		case <-stopChan:
 			break Outer
 		default:
+			time.Sleep(10 * time.Millisecond)
 			l.listenOnce(events)
 		}
 	}
