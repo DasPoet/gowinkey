@@ -111,6 +111,7 @@ func (l *listener) listenOnce(events chan KeyEvent) {
 		} else {
 			if l.isPressed(vk) {
 				event.Type = KeyReleased
+				l.applyModifiers(&event)
 				l.setIsPressed(vk, false)
 				events <- event
 			}
