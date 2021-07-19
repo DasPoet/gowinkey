@@ -46,6 +46,10 @@ func (e KeyEvent) HasMenu() bool {
 	return e.Modifiers&ModifierMenu > 0
 }
 
+func (e *KeyEvent) applyModifier(modifier uint) {
+	e.Modifiers |= modifier
+}
+
 // String returns the string representation of e.
 func (e KeyEvent) String() string {
 	s := e.VirtualKey.String()
