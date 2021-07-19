@@ -21,6 +21,16 @@ type KeyEvent struct {
 	Modifiers uint `json:"modifiers,omitempty"`
 }
 
+// Pressed reports whether e represents a key press.
+func (e KeyEvent) Pressed() bool {
+	return e.Type == KeyPressed
+}
+
+// Released reports whether e represents a key release.
+func (e KeyEvent) Released() bool {
+	return e.Type == KeyReleased
+}
+
 // HasShift reports whether e contains any 'shift' modifier.
 func (e KeyEvent) HasShift() bool {
 	return e.Modifiers&ModifierShift > 0
