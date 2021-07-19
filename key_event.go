@@ -26,12 +26,12 @@ func (e KeyEvent) HasShift() bool {
 	return e.Modifiers&ModifierShift > 0
 }
 
-// HasShift reports whether e contains any 'ctrl' modifier.
+// HasControl reports whether e contains any 'ctrl' modifier.
 func (e KeyEvent) HasControl() bool {
 	return e.Modifiers&ModifierControl > 0
 }
 
-// HasShift reports whether e contains any 'alt' modifier.
+// HasMenu reports whether e contains any 'alt' modifier.
 func (e KeyEvent) HasMenu() bool {
 	return e.Modifiers&ModifierMenu > 0
 }
