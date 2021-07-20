@@ -5,8 +5,6 @@ import (
 	"time"
 )
 
-const keyDown = 0x8000
-
 // listener listens for global key events.
 type listener struct {
 	keyStates map[VirtualKey]bool
@@ -91,8 +89,6 @@ Outer:
 // channel.
 func (l *listener) listenOnce(events chan KeyEvent) {
 	for i := 0; i < 255; i++ {
-		state := getKeyState(i)
-
 		vk := VirtualKey(i)
 
 		if vk == VK_SHIFT || vk == VK_CONTROL || vk == VK_MENU {
@@ -101,16 +97,16 @@ func (l *listener) listenOnce(events chan KeyEvent) {
 
 		event := KeyEvent{VirtualKey: vk}
 
-		if isKeyDown(state) {
+		if getKeyState(i) == KeyDown {
 			if !l.isPressed(vk) {
-				event.Type = KeyPressed
+				event.State = keyDown
 				l.applyModifiers(&event)
 				l.setIsPressed(vk, true)
 				events <- event
 			}
 		} else {
 			if l.isPressed(vk) {
-				event.Type = KeyReleased
+				event.State = KeyUp
 				l.applyModifiers(&event)
 				l.setIsPressed(vk, false)
 				events <- event
@@ -124,7 +120,7 @@ func (l *listener) listenOnce(events chan KeyEvent) {
 // listener.listen was called.
 func (l listener) swallowQueuedStates() {
 	for i := 0; i < 256; i++ {
-		getKeyState(i)
+		_getKeyState(i)
 	}
 }
 
@@ -156,8 +152,4 @@ func (l *listener) setIsPressed(key VirtualKey, value bool) {
 	l.mu.Lock()
 	l.keyStates[key] = value
 	l.mu.Unlock()
-}
-
-func isKeyDown(keyState int32) bool {
-	return keyState&keyDown == keyDown
 }
