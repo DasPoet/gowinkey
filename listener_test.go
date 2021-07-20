@@ -13,10 +13,10 @@ func Example() {
 	})
 
 	for e := range events {
-		switch e.Type {
-		case KeyPressed:
+		switch e.State {
+		case KeyDown:
 			fmt.Println("pressed", e)
-		case KeyReleased:
+		case KeyUp:
 			fmt.Println("released", e)
 		}
 	}
