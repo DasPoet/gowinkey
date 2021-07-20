@@ -35,9 +35,9 @@ func (e *KeyEvent) applyModifiers(modifier Modifiers) {
 
 // String returns the string representation of e.
 func (e KeyEvent) String() string {
-	keyString := e.VirtualKey.String()
-	if modString := e.Modifiers.String(); modString != "" {
-		return keyString + " + " + modString
+	s := e.VirtualKey.String()
+	if mods := e.Modifiers.String(); mods != "" {
+		return s + " + " + mods
 	}
-	return keyString
+	return s
 }
