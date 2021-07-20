@@ -18,13 +18,13 @@ func virtualKeyToString(vk VirtualKey) string {
 	return fmt.Sprint(char)
 }
 
-// getKeyState determines whether the given key is up or down
+// _getKeyState determines whether the given key is up or down
 // at the time this function is called, and whether the key
-// was pressed after a previous call to getKeyState.
+// was pressed after a previous call to _getKeyState.
 //
 // See https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getasynckeystate
 // for more details.
-func getKeyState(key int) int32 {
+func _getKeyState(key int) int32 {
 	state, _, _ := syscall.Syscall(keystate.Addr(), 1, uintptr(key), 0, 0)
 	return int32(state)
 }
