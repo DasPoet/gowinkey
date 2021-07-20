@@ -11,9 +11,11 @@ type listener struct {
 	mu        *sync.Mutex
 }
 
-var defaultListener = &listener{
-	keyStates: make(map[VirtualKey]bool),
-	mu:        new(sync.Mutex),
+func newListener() *listener {
+	return &listener{
+		keyStates: make(map[VirtualKey]bool),
+		mu: new(sync.Mutex),
+	}
 }
 
 // Listen listens for global key events, sending them on the
@@ -22,13 +24,13 @@ var defaultListener = &listener{
 // soon as stopFn is called.
 // Listen does not block.
 func Listen() (events <-chan KeyEvent, stopFn func()) {
-	return defaultListener.listen()
+	return newListener().listen()
 }
 
 // ListenSelective is like Listen, but it only
 // dispatches events for the given virtual keys.
 func ListenSelective(keys ...VirtualKey) (events <-chan KeyEvent, stopFn func()) {
-	return defaultListener.listenSelective(keys...)
+	return newListener().listenSelective(keys...)
 }
 
 // listen listens for global key events, sending them on the
