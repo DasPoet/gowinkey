@@ -132,13 +132,13 @@ func (l listener) swallowQueuedStates() {
 // the currently pressed keys to the event.
 func (l listener) applyModifiers(event *KeyEvent) {
 	if l.keyStates[VK_LSHIFT] || l.keyStates[VK_RSHIFT] {
-		event.applyModifier(ModifierShift)
+		event.applyModifiers(ModifierShift)
 	}
 	if l.keyStates[VK_LCONTROL] || l.keyStates[VK_RCONTROL] {
-		event.applyModifier(ModifierControl)
+		event.applyModifiers(ModifierControl)
 	}
 	if l.keyStates[VK_LMENU] || l.keyStates[VK_RMENU] {
-		event.applyModifier(ModifierMenu)
+		event.applyModifiers(ModifierMenu)
 	}
 }
 

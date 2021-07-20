@@ -18,7 +18,7 @@ type KeyEvent struct {
 
 	// Modifiers is the bitwise or of the modifiers
 	// that were active when the event was dispatched.
-	Modifiers uint `json:"modifiers,omitempty"`
+	Modifiers Modifiers `json:"modifiersToStr,omitempty"`
 }
 
 // Pressed reports whether e represents a key press.
@@ -33,34 +33,28 @@ func (e KeyEvent) Released() bool {
 
 // HasShift reports whether e contains any 'shift' modifier.
 func (e KeyEvent) HasShift() bool {
-	return e.Modifiers&ModifierShift > 0
+	return e.Modifiers.HasModifiers(ModifierShift)
 }
 
 // HasControl reports whether e contains any 'ctrl' modifier.
 func (e KeyEvent) HasControl() bool {
-	return e.Modifiers&ModifierControl > 0
+	return e.Modifiers.HasModifiers(ModifierShift)
 }
 
 // HasMenu reports whether e contains any 'alt' modifier.
 func (e KeyEvent) HasMenu() bool {
-	return e.Modifiers&ModifierMenu > 0
+	return e.Modifiers.HasModifiers(ModifierMenu)
 }
 
-func (e *KeyEvent) applyModifier(modifier uint) {
+func (e *KeyEvent) applyModifiers(modifier Modifiers) {
 	e.Modifiers |= modifier
 }
 
 // String returns the string representation of e.
 func (e KeyEvent) String() string {
-	s := e.VirtualKey.String()
-	if e.HasControl() {
-		s += "+Ctrl"
+	keyString := e.VirtualKey.String()
+	if modString := e.Modifiers.String(); modString != "" {
+		return keyString + " + " + modString
 	}
-	if e.HasShift() {
-		s += "+Shift"
-	}
-	if e.HasMenu() {
-		s += "+Alt"
-	}
-	return s
+	return keyString
 }
