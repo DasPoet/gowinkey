@@ -6,6 +6,7 @@ import (
 
 // listener listens for global key events.
 type listener struct {
+	modifiers Modifiers
 	keyStates map[VirtualKey]bool
 }
 
@@ -89,29 +90,97 @@ Outer:
 func (l *listener) listenOnce(events chan KeyEvent) {
 	for i := 0; i < 255; i++ {
 		vk := VirtualKey(i)
-
-		if vk == VK_SHIFT || vk == VK_CONTROL || vk == VK_MENU {
+		if l.isDuplicatedModifier(vk) {
 			continue
 		}
 
-		event := KeyEvent{VirtualKey: vk}
+		state := getKeyState(i)
+		event := KeyEvent{
+			VirtualKey: vk,
+			State:      state,
+		}
 
-		if getKeyState(i) == KeyDown {
+		if state == KeyDown {
 			if !l.keyStates[vk] {
-				event.State = keyDown
-				l.applyModifiers(&event)
 				l.keyStates[vk] = true
+				l.processModifier(vk, KeyDown)
+
+				l.applyModifiers(&event)
 				events <- event
 			}
 		} else {
 			if l.keyStates[vk] {
-				event.State = KeyUp
-				l.applyModifiers(&event)
 				l.keyStates[vk] = false
+				l.processModifier(vk, KeyUp)
+
+				l.applyModifiers(&event)
 				events <- event
 			}
 		}
 	}
+}
+
+// isDuplicatedModifier reports whether the given
+// virtual key represents a duplicated modifier.
+//
+// This is needed, because the Windows API fires two events
+// when a modifier key is pressed - one for the specific key
+// (say, VK_LSHIFT) and one for the "raw" modifier
+// (say, VK_SHIFT).
+func (l listener) isDuplicatedModifier(key VirtualKey) bool {
+	return key == VK_SHIFT || key == VK_CONTROL || key == VK_MENU
+}
+
+// processModifier extracts modifier information from the given
+// given virtual key and updates the listener.modifiers accordingly.
+func (l *listener) processModifier(key VirtualKey, state KeyState) {
+	mod := l.keyToModifier(key)
+	if state == KeyDown {
+		l.modifiers |= mod
+	} else {
+		if !l.modifierCounterpartPressed(key) {
+			l.modifiers = l.modifiers.RemoveModifiers(mod)
+		}
+	}
+}
+
+// modifierCounterpartPressed reports whether the "counterpart" of
+// the given modifier key is pressed, where by counterpart we mean
+// the left version for right modifier keys and vice versa.
+//
+// If key does not represent a modifier key,
+// modifierCounterPartPressed returns false.
+func (l listener) modifierCounterpartPressed(key VirtualKey) bool {
+	switch key {
+	case VK_LSHIFT:
+		return l.keyStates[VK_RSHIFT]
+	case VK_RSHIFT:
+		return l.keyStates[VK_LSHIFT]
+	case VK_LCONTROL:
+		return l.keyStates[VK_RCONTROL]
+	case VK_RCONTROL:
+		return l.keyStates[VK_LCONTROL]
+	case VK_LMENU:
+		return l.keyStates[VK_RMENU]
+	case VK_RMENU:
+		return l.keyStates[VK_LMENU]
+	}
+	return false
+}
+
+// keyToModifier returns the Modifiers associated with
+// the given virtual key. If the key does not represent
+// any modifiers, keyToModifier returns 0.
+func (l listener) keyToModifier(key VirtualKey) Modifiers {
+	switch key {
+	case VK_SHIFT, VK_LSHIFT, VK_RSHIFT:
+		return ModifierShift
+	case VK_CONTROL, VK_LCONTROL, VK_RCONTROL:
+		return ModifierControl
+	case VK_MENU, VK_LMENU, VK_RMENU:
+		return ModifierMenu
+	}
+	return 0
 }
 
 // swallowQueuedStates drains the message queue so that the
@@ -126,13 +195,6 @@ func (l listener) swallowQueuedStates() {
 // applyModifiers applies modifiers for
 // the currently pressed keys to the event.
 func (l listener) applyModifiers(event *KeyEvent) {
-	if l.keyStates[VK_LSHIFT] || l.keyStates[VK_RSHIFT] {
-		event.applyModifiers(ModifierShift)
-	}
-	if l.keyStates[VK_LCONTROL] || l.keyStates[VK_RCONTROL] {
-		event.applyModifiers(ModifierControl)
-	}
-	if l.keyStates[VK_LMENU] || l.keyStates[VK_RMENU] {
-		event.applyModifiers(ModifierMenu)
-	}
+	eventMod := l.keyToModifier(event.VirtualKey)
+	event.Modifiers = l.modifiers.RemoveModifiers(eventMod)
 }
