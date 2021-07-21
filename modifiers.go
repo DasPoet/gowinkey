@@ -42,10 +42,9 @@ func (m Modifiers) HasModifiers(modifiers Modifiers) bool {
 	return m&modifiers != 0
 }
 
-// RemoveModifiers removes the given modifiers from m.
-func (m *Modifiers) RemoveModifiers(modifiers Modifiers) *Modifiers {
-	*m &= ^modifiers
-	return m
+// RemoveModifiers returns a copy of m with the given modifiers removed.
+func (m Modifiers) RemoveModifiers(modifiers Modifiers) Modifiers {
+	return m & ^modifiers
 }
 
 // String returns the string representation of m.
