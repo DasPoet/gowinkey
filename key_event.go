@@ -29,10 +29,6 @@ func (e KeyEvent) HasMenu() bool {
 	return e.Modifiers.HasModifiers(ModifierMenu)
 }
 
-func (e *KeyEvent) applyModifiers(modifier Modifiers) {
-	e.Modifiers |= modifier
-}
-
 // String returns the string representation of e.
 func (e KeyEvent) String() string {
 	s := e.VirtualKey.String()
