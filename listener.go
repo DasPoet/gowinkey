@@ -190,32 +190,3 @@ func (l listener) satisfiesPredicates(event KeyEvent) bool {
 	}
 	return true
 }
-
-// ListenSelective is like Listen, but it only
-// dispatches events for the given virtual keys.
-func ListenSelective(keys ...VirtualKey) (events <-chan KeyEvent, stopFn func()) {
-	return newListener().listenSelective(keys...)
-}
-
-// listenSelective is like listen, but it only
-// dispatches events for the given virtual keys.
-func (l *listener) listenSelective(keys ...VirtualKey) (<-chan KeyEvent, func()) {
-	keySet := make(map[VirtualKey]struct{})
-	for _, key := range keys {
-		keySet[key] = struct{}{}
-	}
-
-	events := make(chan KeyEvent)
-	evt, stopFn := l.listen()
-
-	go func() {
-		for event := range evt {
-			_, ok := keySet[event.VirtualKey]
-			if ok {
-				events <- event
-			}
-		}
-	}()
-
-	return events, stopFn
-}
