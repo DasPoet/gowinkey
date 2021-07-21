@@ -9,6 +9,10 @@ type KeyEvent struct {
 	// VirtualKey represents the event's virtual key.
 	VirtualKey VirtualKey `json:"virtualKey,omitempty"`
 
+	// PressedKeys is the set of all other keys that were
+	// pressed at the time the event was dispatched.
+	PressedKeys KeySet
+
 	// Modifiers is the bitwise or of the modifiers
 	// that were active when the event was dispatched.
 	Modifiers Modifiers `json:"modifiersToStr,omitempty"`
