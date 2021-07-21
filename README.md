@@ -24,11 +24,12 @@
 ## Contents
 
 - [gowinkey](#gowinkey)
-    - [Contents](#contents)
-    - [Installation](#installation)
-    - [If you prefer using Java...](#if-you-prefer-using-java)
-    - [Getting started](#getting-started)
-    - [Filtering events](#filtering-events)
+	- [Contents](#contents)
+	- [Installation](#installation)
+	- [If you prefer using Java...](#if-you-prefer-using-java)
+	- [Getting started](#getting-started)
+	- [Predicates](#predicates)
+		- [Example](#example)
 
 ## Installation
 
@@ -89,20 +90,17 @@ func main() {
 }
 ```
 
-This will listen for and print out key events for one minute, providing
-additional information on whether an event was raised because of a key press or
-release.
+## Predicates
 
-## Filtering events
+To help customise the way that `Listen` works, gowinkey uses [Predicates](https://github.com/DasPoet/gowinkey/blob/master/predicates.go). You can either supply your own, or use those that have already been created for you. You can find a collection of predefined predicates [here](https://github.com/DasPoet/gowinkey/blob/master/key_event.go).
 
-Suppose that we don't want to get bombarded with key events. For instance, we
-could only be interested in events for the keys *W*, *A*, *S* and *D*, because
-we want to write some basic movement for a game, or something.
+### Example
 
-Well, that is what `gowinkey.ListenSelective()` was made for.
+Suppose we don't want to get bombarded with key events. For instance, we could only be interested in events for the keys *W*, *A*, *S* and *D*, because we want to write some basic movement for a game, or something.
 
-We can change our previous example only slightly to discard all events we don't
-want:
+We can now alter the code from above just slightly by passing the predefined predicate `Selective` to `Listen`. Notice that `Selective` takes the keys we want to listen for and returns an appropriate predicate that will handle all the work for us.
+
+Consider the following code snippet:
 
 ```go
 package main
@@ -114,7 +112,13 @@ import (
 )
 
 func main() {
-	events, stopFn := gowinkey.ListenSelective(gowinkey.VK_W, gowinkey.VK_A, gowinkey.VK_S, gowinkey.VK_D)
+	keys := []gowinkey.VirtualKey{
+		gowinkey.VK_W,
+		gowinkey.VK_A,
+		gowinkey.VK_S,
+		gowinkey.VK_D,
+	}
+	events, stopFn := gowinkey.Listen(gowinkey.Selective(keys...))
 
 	time.AfterFunc(time.Minute, func() {
 		stopFn()
@@ -122,15 +126,11 @@ func main() {
 
 	for e := range events {
 		switch e.State {
-		case gowinkey.KeyUp:
-			fmt.Println("pressed", e)
 		case gowinkey.KeyDown:
+			fmt.Println("pressed", e)
+		case gowinkey.KeyUp:
 			fmt.Println("released", e)
 		}
 	}
 }
 ```
-
-Notice that we pass the virtual keycodes we want to listen for explicitly
-and `gowinkey` handles all the work for us, so that we can concentrate on the
-important parts of our application. How wonderful!
