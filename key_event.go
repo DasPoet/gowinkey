@@ -3,7 +3,7 @@ package gowinkey
 // KeyEvent represents a key event.
 type KeyEvent struct {
 	// State represents the state of the event's virtual
-	// key at the time the event was dispatches.
+	// key at the time the event was dispatched.
 	State KeyState `json:"type,omitempty"`
 
 	// VirtualKey represents the event's virtual key.
