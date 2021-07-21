@@ -8,11 +8,13 @@ import (
 type listener struct {
 	modifiers   Modifiers
 	pressedKeys KeySet
+	predicates  []Predicate
 }
 
-func newListener() *listener {
+func newListener(predicates ...Predicate) *listener {
 	return &listener{
 		pressedKeys: make(KeySet),
+		predicates:  predicates,
 	}
 }
 
@@ -21,8 +23,10 @@ func newListener() *listener {
 // Listen halts execution and closes the events channel as
 // soon as stopFn is called.
 // Listen does not block.
-func Listen() (events <-chan KeyEvent, stopFn func()) {
-	return newListener().listen()
+// The given predicates act as a filter. Only events matching
+// all predicates will be sent on the events channel.
+func Listen(predicates ...Predicate) (events <-chan KeyEvent, stopFn func()) {
+	return newListener(predicates...).listen()
 }
 
 // listen listens for global key events, sending them on the
@@ -86,8 +90,10 @@ func (l *listener) listenOnce(events chan KeyEvent) {
 				l.processModifier(key, KeyDown)
 
 				l.applyModifiers(&event)
-				event.PressedKeys = l.pressedKeys
-				events <- event
+				if l.satisfiesPredicates(event) {
+					event.PressedKeys = l.pressedKeys
+					events <- event
+				}
 			}
 		} else {
 			if l.pressedKeys.Contains(key) {
@@ -95,8 +101,10 @@ func (l *listener) listenOnce(events chan KeyEvent) {
 				l.processModifier(key, KeyUp)
 
 				l.applyModifiers(&event)
-				event.PressedKeys = l.pressedKeys
-				events <- event
+				if l.satisfiesPredicates(event) {
+					event.PressedKeys = l.pressedKeys
+					events <- event
+				}
 			}
 		}
 	}
@@ -170,6 +178,17 @@ func (l listener) modifierCounterpartPressed(key VirtualKey) bool {
 func (l listener) applyModifiers(event *KeyEvent) {
 	eventMod := l.keyToModifier(event.VirtualKey)
 	event.Modifiers = l.modifiers.RemoveModifiers(eventMod)
+}
+
+// satisfiesPredicates reports whether the given
+// key event satisfies all listener.predicates.
+func (l listener) satisfiesPredicates(event KeyEvent) bool {
+	for _, p := range l.predicates {
+		if !p(event) {
+			return false
+		}
+	}
+	return true
 }
 
 // ListenSelective is like Listen, but it only
