@@ -39,3 +39,13 @@ func (s KeySet) ContainsAll(keys ...VirtualKey) bool {
 	}
 	return true
 }
+
+// ContainsAny reports whether s contains any of the given virtual keys.
+func(s KeySet) ContainsAny(keys ...VirtualKey) bool {
+	for _, key := range keys {
+		if s.Contains(key) {
+			return true
+		}
+	}
+	return false
+}
