@@ -6,13 +6,13 @@ import (
 
 // listener listens for global key events.
 type listener struct {
-	modifiers Modifiers
-	keyStates KeySet
+	modifiers   Modifiers
+	pressedKeys KeySet
 }
 
 func newListener() *listener {
 	return &listener{
-		keyStates: make(KeySet),
+		pressedKeys: make(KeySet),
 	}
 }
 
@@ -81,16 +81,16 @@ func (l *listener) listenOnce(events chan KeyEvent) {
 		}
 
 		if state == KeyDown {
-			if !l.keyStates.Contains(key) {
-				l.keyStates.Add(key)
+			if !l.pressedKeys.Contains(key) {
+				l.pressedKeys.Add(key)
 				l.processModifier(key, KeyDown)
 
 				l.applyModifiers(&event)
 				events <- event
 			}
 		} else {
-			if l.keyStates.Contains(key) {
-				l.keyStates.Delete(key)
+			if l.pressedKeys.Contains(key) {
+				l.pressedKeys.Delete(key)
 				l.processModifier(key, KeyUp)
 
 				l.applyModifiers(&event)
@@ -148,17 +148,17 @@ func (l listener) keyToModifier(key VirtualKey) Modifiers {
 func (l listener) modifierCounterpartPressed(key VirtualKey) bool {
 	switch key {
 	case VK_LSHIFT:
-		return l.keyStates.Contains(VK_RSHIFT)
+		return l.pressedKeys.Contains(VK_RSHIFT)
 	case VK_RSHIFT:
-		return l.keyStates.Contains(VK_LSHIFT)
+		return l.pressedKeys.Contains(VK_LSHIFT)
 	case VK_LCONTROL:
-		return l.keyStates.Contains(VK_RCONTROL)
+		return l.pressedKeys.Contains(VK_RCONTROL)
 	case VK_RCONTROL:
-		return l.keyStates.Contains(VK_LCONTROL)
+		return l.pressedKeys.Contains(VK_LCONTROL)
 	case VK_LMENU:
-		return l.keyStates.Contains(VK_RMENU)
+		return l.pressedKeys.Contains(VK_RMENU)
 	case VK_RMENU:
-		return l.keyStates.Contains(VK_LMENU)
+		return l.pressedKeys.Contains(VK_LMENU)
 	}
 	return false
 }
