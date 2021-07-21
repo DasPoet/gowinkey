@@ -11,7 +11,7 @@ type KeyEvent struct {
 
 	// PressedKeys is the set of all other keys that were
 	// pressed at the time the event was dispatched.
-	PressedKeys KeySet
+	PressedKeys KeySet `json:"pressedKeys,omitempty"`
 
 	// Modifiers is the bitwise or of the modifiers
 	// that were active when the event was dispatched.
