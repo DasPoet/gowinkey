@@ -14,7 +14,7 @@ type listener struct {
 func newListener() *listener {
 	return &listener{
 		keyStates: make(map[VirtualKey]bool),
-		mu: new(sync.Mutex),
+		mu:        new(sync.Mutex),
 	}
 }
 
