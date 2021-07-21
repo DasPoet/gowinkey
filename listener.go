@@ -1,20 +1,17 @@
 package gowinkey
 
 import (
-	"sync"
 	"time"
 )
 
 // listener listens for global key events.
 type listener struct {
 	keyStates map[VirtualKey]bool
-	mu        *sync.Mutex
 }
 
 func newListener() *listener {
 	return &listener{
 		keyStates: make(map[VirtualKey]bool),
-		mu:        new(sync.Mutex),
 	}
 }
 
@@ -100,17 +97,17 @@ func (l *listener) listenOnce(events chan KeyEvent) {
 		event := KeyEvent{VirtualKey: vk}
 
 		if getKeyState(i) == KeyDown {
-			if !l.isPressed(vk) {
+			if !l.keyStates[vk] {
 				event.State = keyDown
 				l.applyModifiers(&event)
-				l.setIsPressed(vk, true)
+				l.keyStates[vk] = true
 				events <- event
 			}
 		} else {
-			if l.isPressed(vk) {
+			if l.keyStates[vk] {
 				event.State = KeyUp
 				l.applyModifiers(&event)
-				l.setIsPressed(vk, false)
+				l.keyStates[vk] = false
 				events <- event
 			}
 		}
@@ -138,20 +135,4 @@ func (l listener) applyModifiers(event *KeyEvent) {
 	if l.keyStates[VK_LMENU] || l.keyStates[VK_RMENU] {
 		event.applyModifiers(ModifierMenu)
 	}
-}
-
-// isPressed reports whether the given virtual key is
-// registered as pressed in the listener.keyStates.
-func (l listener) isPressed(key VirtualKey) bool {
-	l.mu.Lock()
-	defer l.mu.Unlock()
-	return l.keyStates[key]
-}
-
-// setIsPressed sets the status of the given virtual
-// key in listener.keyStates to the given value.
-func (l *listener) setIsPressed(key VirtualKey, value bool) {
-	l.mu.Lock()
-	l.keyStates[key] = value
-	l.mu.Unlock()
 }
