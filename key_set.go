@@ -10,6 +10,16 @@ func NewKeySet(keys ...VirtualKey) KeySet {
 	return set
 }
 
+// Slice returns a slice containing the virtual keys in s.
+func (s KeySet) Slice() []VirtualKey {
+	slice, i := make([]VirtualKey, len(s)), 0
+	for key := range s {
+		slice[i] = key
+		i++
+	}
+	return slice
+}
+
 // Add adds the given virtual keys to s.
 func (s KeySet) Add(keys ...VirtualKey) {
 	for _, key := range keys {
@@ -41,7 +51,7 @@ func (s KeySet) ContainsAll(keys ...VirtualKey) bool {
 }
 
 // ContainsAny reports whether s contains any of the given virtual keys.
-func(s KeySet) ContainsAny(keys ...VirtualKey) bool {
+func (s KeySet) ContainsAny(keys ...VirtualKey) bool {
 	for _, key := range keys {
 		if s.Contains(key) {
 			return true
