@@ -23,7 +23,7 @@ func KeyboardOnly(event KeyEvent) bool {
 }
 
 // PressedOnly is a Predicate allowing
-// only events for key pressed to pass.
+// only events for key presses to pass.
 func PressedOnly(event KeyEvent) bool {
 	return event.State == KeyDown
 }
