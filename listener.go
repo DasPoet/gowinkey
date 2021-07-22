@@ -90,8 +90,8 @@ func (l *listener) listenOnce(events chan KeyEvent) {
 				l.processModifier(key, KeyDown)
 
 				l.applyModifiers(&event)
+				event.PressedKeys = l.pressedKeys
 				if l.satisfiesPredicates(event) {
-					event.PressedKeys = l.pressedKeys
 					events <- event
 				}
 			}
@@ -101,8 +101,8 @@ func (l *listener) listenOnce(events chan KeyEvent) {
 				l.processModifier(key, KeyUp)
 
 				l.applyModifiers(&event)
+				event.PressedKeys = l.pressedKeys
 				if l.satisfiesPredicates(event) {
-					event.PressedKeys = l.pressedKeys
 					events <- event
 				}
 			}
