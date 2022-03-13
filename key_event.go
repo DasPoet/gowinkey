@@ -25,7 +25,7 @@ func (e KeyEvent) HasShift() bool {
 
 // HasControl reports whether e contains any 'ctrl' modifier.
 func (e KeyEvent) HasControl() bool {
-	return e.Modifiers.HasModifiers(ModifierShift)
+	return e.Modifiers.HasModifiers(ModifierControl)
 }
 
 // HasMenu reports whether e contains any 'alt' modifier.
